@@ -11,6 +11,7 @@ class AppTheme {
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
     colorScheme: ColorScheme.fromSeed(
+      ;
       seedColor: primaryColor,
       brightness: Brightness.light,
     ),
