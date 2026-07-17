@@ -22,6 +22,7 @@ class IsarService {
     }
     return Future.value(Isar.getInstance());
   }
+  
 
   Future<void> saveTransaction(Transaction transaction) async {
     final isar = await db;
