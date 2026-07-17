@@ -7,6 +7,8 @@ class IsarService {
 
   IsarService() {
     db = openDB();
+
+    
   }
 
   Future<Isar> openDB() async {
