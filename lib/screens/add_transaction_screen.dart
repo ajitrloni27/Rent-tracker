@@ -6,7 +6,8 @@ import '../utils/currency_formatter.dart';
 import '../core/theme.dart';
 
 class AddTransactionScreen extends ConsumerStatefulWidget {
-  const AddTransactionScreen({super.key});
+  final VoidCallback? onSave;
+  const AddTransactionScreen({super.key, this.onSave});
 
   @override
   ConsumerState<AddTransactionScreen> createState() => _AddTransactionScreenState();
@@ -55,6 +56,8 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
         _type = TransactionType.expense;
         _date = DateTime.now();
       });
+
+      widget.onSave?.call();
     }
   }
 

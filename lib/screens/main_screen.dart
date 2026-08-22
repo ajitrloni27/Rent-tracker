@@ -14,19 +14,23 @@ class MainScreen extends StatefulWidget {
 class _MainScreenState extends State<MainScreen> {
   int _currentIndex = 0;
 
-  final List<Widget> _screens = [
-    const DashboardScreen(),
-    const TransactionsHistoryScreen(),
-    const AddTransactionScreen(),
-    const SettingsScreen(),
-  ];
+
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
         index: _currentIndex,
-        children: _screens,
+        children: [
+          const DashboardScreen(),
+          const TransactionsHistoryScreen(),
+          AddTransactionScreen(onSave: () {
+            setState(() {
+              _currentIndex = 0;
+            });
+          }),
+          const SettingsScreen(),
+        ],
       ),
       bottomNavigationBar: NavigationBar(
         selectedIndex: _currentIndex,
