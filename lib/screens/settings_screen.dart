@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/theme_provider.dart';
 import '../providers/transaction_provider.dart';
+import 'login_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key});
@@ -81,6 +82,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     }
   }
 
+  void _logout() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (route) => false,
+    );
+  }
+
   @override
   void dispose() {
     _nameController.dispose();
@@ -94,54 +102,109 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),
+        centerTitle: true,
       ),
       body: ListView(
+        padding: const EdgeInsets.all(16.0),
         children: [
-          Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(
-                labelText: 'Your Name',
-                border: OutlineInputBorder(),
-                prefixIcon: Icon(Icons.person),
+          _buildSectionHeader('Profile'),
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: TextField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Your Name',
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  prefixIcon: const Icon(Icons.person),
+                ),
+                onChanged: _saveName,
               ),
-              onChanged: _saveName,
             ),
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.brightness_6),
-            title: const Text('Dark Mode'),
-            trailing: Switch(
-              value: themeMode == ThemeMode.dark,
-              onChanged: (value) {
-                ref.read(themeProvider.notifier).toggleTheme();
-              },
+          const SizedBox(height: 24),
+          
+          _buildSectionHeader('Preferences'),
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.brightness_6),
+                  title: const Text('Dark Mode'),
+                  trailing: Switch(
+                    value: themeMode == ThemeMode.dark,
+                    onChanged: (value) {
+                      ref.read(themeProvider.notifier).toggleTheme();
+                    },
+                  ),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: const Text('About'),
+                  subtitle: const Text('Rent & Expense Tracker v1.0.0'),
+                  onTap: () {
+                    showAboutDialog(
+                      context: context,
+                      applicationName: 'Rent & Expense Tracker',
+                      applicationVersion: '1.0.0',
+                      applicationLegalese: '© 2026',
+                    );
+                  },
+                ),
+              ],
             ),
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('About'),
-            subtitle: const Text('Rent & Expense Tracker v1.0.0'),
-            onTap: () {
-              showAboutDialog(
-                context: context,
-                applicationName: 'Rent & Expense Tracker',
-                applicationVersion: '1.0.0',
-                applicationLegalese: '© 2026',
-              );
-            },
+          const SizedBox(height: 24),
+          
+          _buildSectionHeader('Danger Zone', color: Colors.red),
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.delete_forever, color: Colors.red),
+                  title: const Text('Reset App Data', style: TextStyle(color: Colors.red, fontWeight: FontWeight.bold)),
+                  subtitle: const Text('Clear all transactions and data'),
+                  onTap: _resetApp,
+                ),
+              ],
+            ),
           ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.delete_forever, color: Colors.red),
-            title: const Text('Reset App', style: TextStyle(color: Colors.red)),
-            subtitle: const Text('Clear all transactions and data'),
-            onTap: _resetApp,
+          const SizedBox(height: 24),
+          
+          ElevatedButton.icon(
+            onPressed: _logout,
+            icon: const Icon(Icons.logout),
+            label: const Text('LOGOUT'),
+            style: ElevatedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              foregroundColor: Theme.of(context).colorScheme.onSurface,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
           ),
+          const SizedBox(height: 32),
         ],
+      ),
+    );
+  }
+
+  Widget _buildSectionHeader(String title, {Color? color}) {
+    return Padding(
+      padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+      child: Text(
+        title.toUpperCase(),
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          letterSpacing: 1.2,
+          color: color ?? Colors.grey.shade600,
+        ),
       ),
     );
   }
