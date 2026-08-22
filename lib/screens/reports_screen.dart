@@ -6,6 +6,8 @@ import '../models/transaction.dart';
 import '../core/theme.dart';
 import '../utils/formatters.dart';
 
+import '../services/export_service.dart';
+
 class ReportsScreen extends ConsumerWidget {
   const ReportsScreen({super.key});
 
@@ -17,6 +19,33 @@ class ReportsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Reports'),
+        actions: [
+          transactionsAsync.when(
+            data: (transactions) {
+              return IconButton(
+                icon: const Icon(Icons.picture_as_pdf),
+                tooltip: 'Download Monthly Report',
+                onPressed: () {
+                  final now = DateTime.now();
+                  final currentMonthTransactions = transactions.where((t) {
+                    return t.date.year == now.year && t.date.month == now.month;
+                  }).toList();
+
+                  if (currentMonthTransactions.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(content: Text('No transactions for this month to export.')),
+                    );
+                    return;
+                  }
+                  
+                  ExportService.exportPDF(currentMonthTransactions);
+                },
+              );
+            },
+            loading: () => const SizedBox.shrink(),
+            error: (_, __) => const SizedBox.shrink(),
+          ),
+        ],
       ),
       body: transactionsAsync.when(
         data: (transactions) {

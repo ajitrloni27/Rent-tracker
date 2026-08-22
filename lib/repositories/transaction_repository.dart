@@ -36,4 +36,10 @@ class TransactionRepository {
     transactions.sort((a, b) => b.date.compareTo(a.date));
     return transactions;
   }
+
+  Future<void> clearAll() async {
+    return await isar.writeTxn(() async {
+      await isar.transactions.clear();
+    });
+  }
 }

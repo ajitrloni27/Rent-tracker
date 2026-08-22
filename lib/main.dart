@@ -5,6 +5,8 @@ import 'providers/theme_provider.dart';
 import 'core/theme.dart';
 import 'screens/main_screen.dart';
 
+import 'screens/login_screen.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -34,7 +36,7 @@ class RentTrackerApp extends ConsumerWidget {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeMode,
-      home: const MainScreen(),
+      home: const LoginScreen(),
     );
   }
 }

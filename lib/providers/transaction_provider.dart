@@ -32,6 +32,11 @@ class TransactionNotifier extends StateNotifier<List<Transaction>> {
     await _repository.deleteTransaction(id);
     await loadTransactions();
   }
+
+  Future<void> clearAll() async {
+    await _repository.clearAll();
+    await loadTransactions();
+  }
 }
 
 final totalIncomeProvider = Provider<double>((ref) {
