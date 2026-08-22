@@ -109,7 +109,7 @@ class _AddTransactionScreenState extends ConsumerState<AddTransactionScreen> {
                 keyboardType: const TextInputType.numberWithOptions(decimal: true),
                 decoration: const InputDecoration(
                   labelText: 'Amount',
-                  prefixText: '\$ ',
+                  prefixText: '₹ ',
                   border: OutlineInputBorder(),
                 ),
                 validator: (value) {

@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 
 class CurrencyFormatter {
   static String format(double amount) {
-    final formatCurrency = NumberFormat.currency(symbol: '\$', decimalDigits: 2);
+    final formatCurrency = NumberFormat.currency(locale: 'en_IN', symbol: '₹', decimalDigits: 2);
     return formatCurrency.format(amount);
   }
 
