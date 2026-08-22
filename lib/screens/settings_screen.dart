@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/theme_provider.dart';
 import '../providers/transaction_provider.dart';
+import '../services/export_service.dart';
 import 'login_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
@@ -154,6 +155,30 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       applicationVersion: '1.0.0',
                       applicationLegalese: '© 2026',
                     );
+                  },
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  leading: const Icon(Icons.picture_as_pdf),
+                  title: const Text('Download Monthly Report'),
+                  subtitle: const Text('Export this month\'s transactions'),
+                  onTap: () async {
+                    final transactionsAsync = ref.read(transactionsProvider);
+                    transactionsAsync.whenData((transactions) {
+                      final now = DateTime.now();
+                      final currentMonthTransactions = transactions.where((t) {
+                        return t.date.year == now.year && t.date.month == now.month;
+                      }).toList();
+
+                      if (currentMonthTransactions.isEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text('No transactions for this month to export.')),
+                        );
+                        return;
+                      }
+                      
+                      ExportService.exportPDF(currentMonthTransactions);
+                    });
                   },
                 ),
               ],
