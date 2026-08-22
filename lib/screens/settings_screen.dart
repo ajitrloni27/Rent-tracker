@@ -163,22 +163,20 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   title: const Text('Download Monthly Report'),
                   subtitle: const Text('Export this month\'s transactions'),
                   onTap: () async {
-                    final transactionsAsync = ref.read(transactionsProvider);
-                    transactionsAsync.whenData((transactions) {
-                      final now = DateTime.now();
-                      final currentMonthTransactions = transactions.where((t) {
-                        return t.date.year == now.year && t.date.month == now.month;
-                      }).toList();
+                    final transactions = ref.read(transactionProvider);
+                    final now = DateTime.now();
+                    final currentMonthTransactions = transactions.where((t) {
+                      return t.date.year == now.year && t.date.month == now.month;
+                    }).toList();
 
-                      if (currentMonthTransactions.isEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('No transactions for this month to export.')),
-                        );
-                        return;
-                      }
-                      
-                      ExportService.exportPDF(currentMonthTransactions);
-                    });
+                    if (currentMonthTransactions.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('No transactions for this month to export.')),
+                      );
+                      return;
+                    }
+                    
+                    ExportService.exportPDF(currentMonthTransactions);
                   },
                 ),
               ],

@@ -1,6 +1,5 @@
 import 'dart:io';
 import 'package:csv/csv.dart';
-import 'package:file_picker/file_picker.dart';
 import 'package:pdf/pdf.dart';
 import 'package:pdf/widgets.dart' as pw;
 import 'package:printing/printing.dart';
@@ -17,36 +16,26 @@ class ExportService {
     rows.add([
       "Date",
       "Type",
-      "Category",
-      "Reason",
-      "Amount",
-      "Notes"
+      "Description",
+      "Amount"
     ]);
 
     for (var t in transactions) {
       rows.add([
         AppFormatters.date(t.date),
         t.type.name.toUpperCase(),
-        t.category,
-        t.reason,
-        t.amount,
-        t.notes ?? ""
+        t.description,
+        t.amount
       ]);
     }
 
     String csvData = const ListToCsvConverter().convert(rows);
 
-    final result = await FilePicker.platform.saveFile(
-      dialogTitle: 'Save CSV',
-      fileName: 'rent_tracker_export.csv',
-      type: FileType.custom,
-      allowedExtensions: ['csv'],
-    );
-
-    if (result != null) {
-      final file = File(result);
-      await file.writeAsString(csvData);
-    }
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/rent_tracker_export.csv');
+    await file.writeAsString(csvData);
+    
+    await Share.shareXFiles([XFile(file.path)], text: 'Rent Tracker CSV Export');
   }
 
   static Future<void> exportPDF(List<Transaction> transactions) async {
@@ -64,12 +53,11 @@ class ExportService {
               pw.Table.fromTextArray(
                 context: context,
                 data: <List<String>>[
-                  <String>['Date', 'Type', 'Category', 'Reason', 'Amount'],
+                  <String>['Date', 'Type', 'Description', 'Amount'],
                   ...transactions.map((t) => [
                     AppFormatters.date(t.date),
                     t.type.name.toUpperCase(),
-                    t.category,
-                    t.reason,
+                    t.description,
                     AppFormatters.currency(t.amount)
                   ])
                 ],
@@ -80,54 +68,18 @@ class ExportService {
       ),
     );
 
-    final result = await FilePicker.platform.saveFile(
-      dialogTitle: 'Save PDF',
-      fileName: 'rent_tracker_report.pdf',
-      type: FileType.custom,
-      allowedExtensions: ['pdf'],
-    );
+    final dir = await getTemporaryDirectory();
+    final file = File('${dir.path}/rent_tracker_report.pdf');
+    await file.writeAsBytes(await pdf.save());
 
-    if (result != null) {
-      final file = File(result);
-      await file.writeAsBytes(await pdf.save());
-    }
+    await Share.shareXFiles([XFile(file.path)], text: 'Rent Tracker PDF Report');
   }
 
   static Future<bool> backupDatabase() async {
-    final dir = await getApplicationDocumentsDirectory();
-    final dbFile = File('${dir.path}/default.isar');
-    
-    if (await dbFile.exists()) {
-      final result = await FilePicker.platform.saveFile(
-        dialogTitle: 'Save Database Backup',
-        fileName: 'rent_tracker_backup.isar',
-        type: FileType.custom,
-        allowedExtensions: ['isar'],
-      );
-
-      if (result != null) {
-        await dbFile.copy(result);
-        return true;
-      }
-    }
-    return false;
+    return false; // Deprecated due to permissions
   }
 
   static Future<bool> restoreDatabase() async {
-    final result = await FilePicker.platform.pickFiles(
-      dialogTitle: 'Select Backup File',
-      type: FileType.custom,
-      allowedExtensions: ['isar'],
-    );
-
-    if (result != null && result.files.single.path != null) {
-      final dir = await getApplicationDocumentsDirectory();
-      final backupFile = File(result.files.single.path!);
-      final dbFile = File('${dir.path}/default.isar');
-      
-      await backupFile.copy(dbFile.path);
-      return true;
-    }
-    return false;
+    return false; // Deprecated due to permissions
   }
 }
