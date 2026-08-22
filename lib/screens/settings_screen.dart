@@ -145,20 +145,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                 ),
                 const Divider(height: 1),
                 ListTile(
-                  leading: const Icon(Icons.info_outline),
-                  title: const Text('About'),
-                  subtitle: const Text('Rent & Expense Tracker v1.0.0'),
-                  onTap: () {
-                    showAboutDialog(
-                      context: context,
-                      applicationName: 'Rent & Expense Tracker',
-                      applicationVersion: '1.0.0',
-                      applicationLegalese: '© 2026',
-                    );
-                  },
-                ),
-                const Divider(height: 1),
-                ListTile(
                   leading: const Icon(Icons.picture_as_pdf),
                   title: const Text('Download Monthly Report'),
                   subtitle: const Text('Export this month\'s transactions'),
@@ -177,6 +163,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     }
                     
                     ExportService.exportPDF(currentMonthTransactions);
+                  },
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(height: 24),
+
+          _buildSectionHeader('About'),
+          Card(
+            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: const Icon(Icons.info_outline),
+                  title: const Text('About'),
+                  subtitle: const Text('Rent & Expense Tracker v1.0.0'),
+                  onTap: () {
+                    showAboutDialog(
+                      context: context,
+                      applicationName: 'Rent & Expense Tracker',
+                      applicationVersion: '1.0.0',
+                      applicationLegalese: '© 2026',
+                    );
                   },
                 ),
               ],
