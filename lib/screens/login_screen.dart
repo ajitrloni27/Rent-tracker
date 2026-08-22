@@ -16,7 +16,7 @@ class _LoginScreenState extends State<LoginScreen> {
   void _login() {
     if (_formKey.currentState!.validate()) {
       final username = _usernameController.text.trim().toLowerCase();
-      if (username == 'ajit' && _passwordController.text == 'AjitSapthami45') {
+      if (username == 'ajit' && _passwordController.text == 'sap45') {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(builder: (context) => const MainScreen()),
         );
