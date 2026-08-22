@@ -29,7 +29,11 @@ class _MainScreenState extends State<MainScreen> {
               _currentIndex = 0;
             });
           }),
-          const SettingsScreen(),
+          SettingsScreen(onSettingChanged: () {
+            setState(() {
+              _currentIndex = 0;
+            });
+          }),
         ],
       ),
       bottomNavigationBar: NavigationBar(

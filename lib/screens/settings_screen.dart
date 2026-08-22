@@ -7,7 +7,9 @@ import '../services/export_service.dart';
 import 'login_screen.dart';
 
 class SettingsScreen extends ConsumerStatefulWidget {
-  const SettingsScreen({super.key});
+  final VoidCallback? onSettingChanged;
+  
+  const SettingsScreen({super.key, this.onSettingChanged});
 
   @override
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
@@ -122,7 +124,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                   ),
                   prefixIcon: const Icon(Icons.person),
                 ),
-                onChanged: _saveName,
+                onSubmitted: (value) async {
+                  await _saveName(value);
+                  widget.onSettingChanged?.call();
+                },
               ),
             ),
           ),
@@ -140,6 +145,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                     value: themeMode == ThemeMode.dark,
                     onChanged: (value) {
                       ref.read(themeProvider.notifier).toggleTheme();
+                      widget.onSettingChanged?.call();
                     },
                   ),
                 ),
