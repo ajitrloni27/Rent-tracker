@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import '../providers/settings_provider.dart';
-import '../providers/transaction_provider.dart';
-import '../services/export_service.dart';
+import '../providers/theme_provider.dart';
 
 class SettingsScreen extends ConsumerWidget {
   const SettingsScreen({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final isDarkMode = ref.watch(darkModeProvider);
-    final transactionsAsync = ref.watch(transactionsProvider);
+    final themeMode = ref.watch(themeProvider);
 
     return Scaffold(
       appBar: AppBar(
@@ -18,105 +15,28 @@ class SettingsScreen extends ConsumerWidget {
       ),
       body: ListView(
         children: [
-          SwitchListTile(
+          ListTile(
+            leading: const Icon(Icons.brightness_6),
             title: const Text('Dark Mode'),
-            secondary: const Icon(Icons.dark_mode),
-            value: isDarkMode,
-            onChanged: (val) {
-              ref.read(darkModeProvider.notifier).toggle();
-            },
+            trailing: Switch(
+              value: themeMode == ThemeMode.dark,
+              onChanged: (value) {
+                ref.read(themeProvider.notifier).toggleTheme();
+              },
+            ),
           ),
           const Divider(),
           ListTile(
-            leading: const Icon(Icons.picture_as_pdf),
-            title: const Text('Export to PDF'),
-            onTap: () async {
-              final transactions = transactionsAsync.value ?? [];
-              if (transactions.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('No transactions to export')),
-                );
-                return;
-              }
-              await ExportService.exportPDF(transactions);
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.table_chart),
-            title: const Text('Export to CSV'),
-            onTap: () async {
-              final transactions = transactionsAsync.value ?? [];
-              if (transactions.isEmpty) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text('No transactions to export')),
-                );
-                return;
-              }
-              await ExportService.exportCSV(transactions);
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.save),
-            title: const Text('Backup Database'),
-            onTap: () async {
-              final success = await ExportService.backupDatabase();
-              if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text(success ? 'Backup saved' : 'Backup failed/cancelled')),
-                );
-              }
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.restore),
-            title: const Text('Restore Database'),
-            onTap: () async {
-              final success = await ExportService.restoreDatabase();
-              if (context.mounted) {
-                if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Database restored. Please restart app.')),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('Restore failed/cancelled')),
-                  );
-                }
-              }
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.delete_forever, color: Colors.red),
-            title: const Text('Delete All Data', style: TextStyle(color: Colors.red)),
-            onTap: () async {
-              final confirm = await showDialog<bool>(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('About'),
+            subtitle: const Text('Rent & Expense Tracker v1.0.0'),
+            onTap: () {
+              showAboutDialog(
                 context: context,
-                builder: (ctx) => AlertDialog(
-                  title: const Text('Delete All Data'),
-                  content: const Text('Are you sure you want to delete all transactions? This action cannot be undone.'),
-                  actions: [
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, false),
-                      child: const Text('CANCEL'),
-                    ),
-                    TextButton(
-                      onPressed: () => Navigator.pop(ctx, true),
-                      child: const Text('DELETE', style: TextStyle(color: Colors.red)),
-                    ),
-                  ],
-                ),
+                applicationName: 'Rent & Expense Tracker',
+                applicationVersion: '1.0.0',
+                applicationLegalese: '© 2026',
               );
-
-              if (confirm == true) {
-                await ref.read(transactionRepositoryProvider).clearAll();
-                if (context.mounted) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(content: Text('All data deleted')),
-                  );
-                }
-              }
             },
           ),
         ],

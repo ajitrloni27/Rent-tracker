@@ -1,54 +1,71 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction.dart';
-import '../database/isar_service.dart';
 import '../repositories/transaction_repository.dart';
 
-final isarServiceProvider = Provider<IsarService>((ref) {
-  return IsarService();
-});
-
-final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
-  final isarService = ref.watch(isarServiceProvider);
-  return TransactionRepository(isarService);
-});
-
-final transactionsProvider = StreamProvider<List<Transaction>>((ref) {
+final transactionProvider = StateNotifierProvider<TransactionNotifier, List<Transaction>>((ref) {
   final repository = ref.watch(transactionRepositoryProvider);
-  return repository.watchTransactions().map((transactions) {
-    transactions.sort((a, b) => b.date.compareTo(a.date)); // descending by date
-    return transactions;
-  });
+  return TransactionNotifier(repository);
 });
 
-class TransactionStats {
-  final double totalCredit;
-  final double totalDebit;
-  final double balance;
+class TransactionNotifier extends StateNotifier<List<Transaction>> {
+  final TransactionRepository _repository;
 
-  TransactionStats({
-    required this.totalCredit,
-    required this.totalDebit,
-    required this.balance,
-  });
-}
-
-final transactionStatsProvider = Provider<TransactionStats>((ref) {
-  final transactions = ref.watch(transactionsProvider).value ?? [];
-  
-  double credit = 0;
-  double debit = 0;
-
-  for (var t in transactions) {
-    if (t.type == TransactionType.credit) {
-      credit += t.amount;
-    } else {
-      debit += t.amount;
-    }
+  TransactionNotifier(this._repository) : super([]) {
+    loadTransactions();
   }
 
-  return TransactionStats(
-    totalCredit: credit,
-    totalDebit: debit,
-    balance: credit - debit,
-  );
+  Future<void> loadTransactions() async {
+    state = await _repository.getAllTransactions();
+  }
+
+  Future<void> addTransaction(Transaction transaction) async {
+    await _repository.addTransaction(transaction);
+    await loadTransactions();
+  }
+
+  Future<void> updateTransaction(Transaction transaction) async {
+    await _repository.updateTransaction(transaction);
+    await loadTransactions();
+  }
+
+  Future<void> deleteTransaction(int id) async {
+    await _repository.deleteTransaction(id);
+    await loadTransactions();
+  }
+}
+
+final totalIncomeProvider = Provider<double>((ref) {
+  final transactions = ref.watch(transactionProvider);
+  return transactions
+      .where((t) => t.type == TransactionType.income)
+      .fold(0.0, (sum, t) => sum + t.amount);
+});
+
+final totalExpenseProvider = Provider<double>((ref) {
+  final transactions = ref.watch(transactionProvider);
+  return transactions
+      .where((t) => t.type == TransactionType.expense)
+      .fold(0.0, (sum, t) => sum + t.amount);
+});
+
+final currentBalanceProvider = Provider<double>((ref) {
+  final income = ref.watch(totalIncomeProvider);
+  final expense = ref.watch(totalExpenseProvider);
+  return income - expense;
+});
+
+final thisMonthIncomeProvider = Provider<double>((ref) {
+  final transactions = ref.watch(transactionProvider);
+  final now = DateTime.now();
+  return transactions
+      .where((t) => t.type == TransactionType.income && t.date.year == now.year && t.date.month == now.month)
+      .fold(0.0, (sum, t) => sum + t.amount);
+});
+
+final thisMonthExpenseProvider = Provider<double>((ref) {
+  final transactions = ref.watch(transactionProvider);
+  final now = DateTime.now();
+  return transactions
+      .where((t) => t.type == TransactionType.expense && t.date.year == now.year && t.date.month == now.month)
+      .fold(0.0, (sum, t) => sum + t.amount);
 });

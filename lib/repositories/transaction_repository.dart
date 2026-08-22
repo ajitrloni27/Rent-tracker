@@ -1,21 +1,39 @@
+import 'package:isar/isar.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/transaction.dart';
-import '../database/isar_service.dart';
+import '../database/database_service.dart';
+
+final transactionRepositoryProvider = Provider<TransactionRepository>((ref) {
+  final dbService = ref.watch(databaseProvider);
+  return TransactionRepository(dbService.isar);
+});
 
 class TransactionRepository {
-  final IsarService _isarService;
+  final Isar isar;
 
-  TransactionRepository(this._isarService);
+  TransactionRepository(this.isar);
 
-  Future<void> saveTransaction(Transaction transaction) =>
-      _isarService.saveTransaction(transaction);
+  Future<int> addTransaction(Transaction transaction) async {
+    return await isar.writeTxn(() async {
+      return await isar.transactions.put(transaction);
+    });
+  }
 
-  Future<void> deleteTransaction(int id) => _isarService.deleteTransaction(id);
+  Future<int> updateTransaction(Transaction transaction) async {
+    return await isar.writeTxn(() async {
+      return await isar.transactions.put(transaction);
+    });
+  }
 
-  Future<void> clearAll() => _isarService.clearAll();
+  Future<bool> deleteTransaction(int id) async {
+    return await isar.writeTxn(() async {
+      return await isar.transactions.delete(id);
+    });
+  }
 
-  Stream<List<Transaction>> watchTransactions() =>
-      _isarService.listenToTransactions();
-      
-  Future<List<Transaction>> getAllTransactions() => 
-      _isarService.getAllTransactions();
+  Future<List<Transaction>> getAllTransactions() async {
+    final transactions = await isar.transactions.where().findAll();
+    transactions.sort((a, b) => b.date.compareTo(a.date));
+    return transactions;
+  }
 }
