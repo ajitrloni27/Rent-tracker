@@ -1,22 +1,26 @@
+# Rent & Expense Tracker
 
-# rent tracker
+A modern and professional Flutter application to effortlessly track your rental income and expenses.
 
-A new Flutter project.
+## Features
+
+- **Dashboard**: Get a clear overview of your current balance, total income, and total expenses.
+- **Add Transactions**: Quickly log income or expenses with descriptions and dates.
+- **Transaction History**: View all your transactions chronologically, filter by income/expense, and swipe to delete.
+- **Settings**: Easily toggle between a beautiful Light and Dark theme.
+- **Local Storage**: All data is saved locally on your device ensuring speed and privacy using Isar Database.
+
+## Technology Stack
+
+- **Framework**: Flutter & Dart
+- **State Management**: Riverpod
+- **Local Database**: Isar Database
+- **Architecture**: Clean Architecture
 
 ## Getting Started
- 
 
-
-This project is a  starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Learn Flutter](https://docs.flutter.dev/get-started/learn-flutter)
-- [Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Flutter learning resources](https://docs.flutter.dev/reference/learning-resources)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-
+1. Make sure you have Flutter installed on your machine.
+2. Clone the repository.
+3. Run `flutter pub get` to fetch dependencies.
+4. Run `flutter pub run build_runner build -d` to generate the database models.
+5. Launch the app using `flutter run`.
