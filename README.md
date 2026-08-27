@@ -4,6 +4,7 @@ A modern and professional Flutter application to effortlessly track your rental 
 
 ## Features
 
+
 - **Dashboard**: Get a clear overview of your current balance, total income, and total expenses.
 - **Add Transactions**: Quickly log income or expenses with descriptions and dates.
 - **Transaction History**: View all your transactions chronologically, filter by income/expense, and swipe to delete.
