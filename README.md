@@ -2,7 +2,7 @@
 
 A modern and professional Flutter application to effortlessly track your rental income and expenses.
  
-## Features 
+## Features        
 
 
 - **Dashboard**: Get a clear overview of your current balance, total income, and total expenses.
